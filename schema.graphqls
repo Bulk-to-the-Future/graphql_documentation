@@ -1,0 +1,564 @@
+"""
+Root query type for Saleor GraphQL API.
+"""
+type Query {
+  """
+  Retrieves a list of product categories with pagination.
+  """
+  categories(
+    """
+    Number of items to fetch after the cursor.
+    """
+    first: Int
+    """
+    Cursor for forward pagination.
+    """
+    after: String
+    """
+    Number of items to fetch before the cursor.
+    """
+    last: Int
+    """
+    Cursor for backward pagination.
+    """
+    before: String
+  ): CategoryConnection!
+  """
+  Retrieves a list of available channels.
+  """
+  channels: [Channel!]!
+  """
+  Retrieves a list of product types with pagination.
+  """
+  productTypes(
+    """
+    Number of items to fetch after the cursor.
+    """
+    first: Int
+    """
+    Cursor for forward pagination.
+    """
+    after: String
+    """
+    Number of items to fetch before the cursor.
+    """
+    last: Int
+    """
+    Cursor for backward pagination.
+    """
+    before: String
+  ): ProductTypeConnection!
+}
+
+"""
+Root mutation type for Saleor GraphQL API.
+"""
+type Mutation {
+  """
+  Updates channel listings for a product.
+  """
+  productChannelListingUpdate(
+    """
+    ID of the product to update.
+    """
+    id: ID!
+    """
+    Input data for channel listing updates.
+    """
+    input: ProductChannelListingUpdateInput!
+  ): ProductChannelListingUpdatePayload!
+  """
+  Creates a new product.
+  """
+  productCreate(
+    """
+    Input data for product creation.
+    """
+    input: ProductCreateInput!
+  ): ProductCreatePayload!
+  """
+  Translates a product into another language.
+  """
+  productTranslate(
+    """
+    ID of the product to translate.
+    """
+    id: ID!
+    """
+    Language code for translation.
+    """
+    languageCode: LanguageCodeEnum!
+    """
+    Input data for translation.
+    """
+    input: ProductTranslationInput!
+  ): ProductTranslatePayload!
+  """
+  Updates an existing product.
+  """
+  productUpdate(
+    """
+    ID of the product to update.
+    """
+    id: ID!
+    """
+    Input data for the product update.
+    """
+    input: ProductUpdateInput!
+  ): ProductUpdatePayload!
+  """
+  Creates a new product variant.
+  """
+  productVariantCreate(
+    """
+    Input data for variant creation.
+    """
+    input: ProductVariantCreateInput!
+  ): ProductVariantCreatePayload!
+  """
+  Creates an authentication token for a user.
+  """
+  tokenCreate(
+    """
+    Email address for authentication.
+    """
+    email: String!
+    """
+    Password for authentication.
+    """
+    password: String!
+  ): TokenCreatePayload!
+}
+
+"""
+Payload for token creation mutation.
+"""
+type TokenCreatePayload {
+  """
+  Authentication token.
+  """
+  token: String
+  """
+  User associated with the token.
+  """
+  user: User
+}
+
+"""
+Payload for product creation mutation.
+"""
+type ProductCreatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Created product.
+  """
+  product: Product
+}
+
+"""
+Payload for product channel listing update mutation.
+"""
+type ProductChannelListingUpdatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Updated product.
+  """
+  product: Product
+}
+
+"""
+Payload for product variant creation mutation.
+"""
+type ProductVariantCreatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Created product variant.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Payload for product update mutation.
+"""
+type ProductUpdatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Updated product.
+  """
+  product: Product
+}
+
+"""
+Payload for product translation mutation.
+"""
+type ProductTranslatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Translated product.
+  """
+  product: Product
+}
+
+"""
+Connection type for product types, following Relay specification.
+"""
+type ProductTypeConnection {
+  """
+  List of product type edges.
+  """
+  edges: [ProductTypeEdge!]!
+  """
+  Pagination information.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+Edge type for product types.
+"""
+type ProductTypeEdge {
+  """
+  Product type node.
+  """
+  node: ProductType!
+}
+
+"""
+Product type details.
+"""
+type ProductType {
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the product type.
+  """
+  name: String!
+}
+
+"""
+Connection type for categories, following Relay specification.
+"""
+type CategoryConnection {
+  """
+  List of category edges.
+  """
+  edges: [CategoryEdge!]!
+  """
+  Pagination information.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+Edge type for categories.
+"""
+type CategoryEdge {
+  """
+  Category node.
+  """
+  node: Category!
+}
+
+"""
+Category details.
+"""
+type Category {
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the category.
+  """
+  name: String!
+}
+
+"""
+Channel details.
+"""
+type Channel {
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the channel.
+  """
+  name: String!
+}
+
+"""
+User details.
+"""
+type User {
+  """
+  User email address.
+  """
+  email: String!
+  """
+  Unique identifier.
+  """
+  id: ID!
+}
+
+"""
+Product details.
+"""
+type Product {
+  """
+  List of channel listings for the product.
+  """
+  channelListings: [ChannelListing!]
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the product.
+  """
+  name: String!
+  """
+  Translation of the product in a specified language.
+  """
+  translation(
+    """
+    Language code for translation.
+    """
+    languageCode: LanguageCodeEnum!
+  ): ProductTranslation
+}
+
+"""
+Product variant details.
+"""
+type ProductVariant {
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the variant.
+  """
+  name: String!
+}
+
+"""
+Channel listing details for a product.
+"""
+type ChannelListing {
+  """
+  Associated channel.
+  """
+  channel: Channel!
+  """
+  Whether the product is published.
+  """
+  isPublished: Boolean!
+  """
+  Publication timestamp.
+  """
+  publishedAt: String
+  """
+  Whether the product is visible in listings.
+  """
+  visibleInListings: Boolean
+}
+
+"""
+Translation details for a product.
+"""
+type ProductTranslation {
+  """
+  Translated name.
+  """
+  name: String!
+}
+
+"""
+Error details for mutations.
+"""
+type Error {
+  """
+  Field causing the error.
+  """
+  field: String
+  """
+  Error message.
+  """
+  message: String
+}
+
+"""
+Pagination information for Relay connections.
+"""
+type PageInfo {
+  """
+  Cursor for the last item in the current page.
+  """
+  endCursor: String
+  """
+  Whether there is a next page.
+  """
+  hasNextPage: Boolean!
+  """
+  Whether there is a previous page.
+  """
+  hasPreviousPage: Boolean!
+  """
+  Cursor for the first item in the current page.
+  """
+  startCursor: String
+}
+
+"""
+Input for creating a product.
+"""
+input ProductCreateInput {
+  """
+  Category ID for the product.
+  """
+  category: ID!
+  """
+  Product name.
+  """
+  name: String!
+  """
+  Product type ID.
+  """
+  productType: ID!
+  """
+  Product slug.
+  """
+  slug: String!
+}
+
+"""
+Input for updating product channel listings.
+"""
+input ProductChannelListingUpdateInput {
+  """
+  List of channel updates.
+  """
+  updateChannels: [ChannelUpdateInput!]!
+}
+
+"""
+Input for updating a channel.
+"""
+input ChannelUpdateInput {
+  """
+  Whether the product is available for purchase.
+  """
+  availableForPurchase: Boolean
+  """
+  Date when the product becomes available for purchase.
+  """
+  availableForPurchaseDate: String
+  """
+  Channel ID.
+  """
+  channelId: ID!
+  """
+  Whether the product is published.
+  """
+  isPublished: Boolean
+  """
+  Publication date.
+  """
+  publicationDate: String
+  """
+  Publication timestamp.
+  """
+  publishedAt: String
+  """
+  Whether the product is visible in listings.
+  """
+  visibleInListings: Boolean
+}
+
+"""
+Input for creating a product variant.
+"""
+input ProductVariantCreateInput {
+  """
+  List of attributes.
+  """
+  attributes: [AttributeValueInput!]
+  """
+  Variant name.
+  """
+  name: String!
+  """
+  Product ID.
+  """
+  product: ID!
+  """
+  Stock keeping unit.
+  """
+  sku: String!
+}
+
+"""
+Input for attribute values.
+"""
+input AttributeValueInput {
+  """
+  Attribute ID.
+  """
+  id: ID
+  """
+  Attribute values.
+  """
+  values: [String!]
+}
+
+"""
+Input for updating a product.
+"""
+input ProductUpdateInput {
+  """
+  Updated product name.
+  """
+  name: String!
+}
+
+"""
+Input for translating a product.
+"""
+input ProductTranslationInput {
+  """
+  Translated product name.
+  """
+  name: String!
+}
+
+"""
+Language codes for translations.
+"""
+enum LanguageCodeEnum {
+  """
+  English.
+  """
+  EN
+  """
+  French.
+  """
+  FR
+}

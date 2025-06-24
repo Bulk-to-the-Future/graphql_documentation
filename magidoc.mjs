@@ -15,7 +15,6 @@ export default {
         description: 'Documentation for Saleor GraphQL API operations, including queries and mutations.',
         keywords: 'Saleor, GraphQL, API, Documentation',
       },
-      baseUrl: '/graphql_documentation/',
       queryGenerationFactories: {
         PositiveDecimal: 10.99,
         WeightScalar: 1.5,

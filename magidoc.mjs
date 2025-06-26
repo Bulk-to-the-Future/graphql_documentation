@@ -1,4 +1,5 @@
-// magidoc.mjs (updated to include queryGenerationFactories)
+
+// magidoc.mjs (updated to include PermissionGroupCreate, staffCreate, and permissionGroups)
 
 export default {
   introspection: {
@@ -117,7 +118,7 @@ export default {
             ## 3. Product Creation
             **Mutation:**
             \`\`\`graphql
-            mutation {
+            mutationin's {
               productCreate(input: {
                 name: "Test Product A"
                 slug: "test-product-a"
@@ -1315,6 +1316,269 @@ export default {
                     "userEmail": "customer@example.com"
                   },
                   "errors": []
+                }
+              }
+            }
+            \`\`\`
+
+            ## 29. Permission Group Creation
+            **Mutation:**
+            \`\`\`graphql
+            mutation PermissionGroupCreate($input: PermissionGroupCreateInput!) {
+              permissionGroupCreate(input: $input) {
+                errors {
+                  code
+                  field
+                  message
+                  __typename
+                }
+                group {
+                  id
+                  name
+                  userCanManage
+                  users {
+                    id
+                    firstName
+                    lastName
+                    __typename
+                  }
+                  restrictedAccessToChannels
+                  accessibleChannels {
+                    id
+                    isActive
+                    name
+                    slug
+                    currencyCode
+                    defaultCountry {
+                      code
+                      country
+                      __typename
+                    }
+                    stockSettings {
+                      allocationStrategy
+                      __typename
+                    }
+                    __typename
+                  }
+                  permissions {
+                    code
+                    name
+                    __typename
+                  }
+                  users {
+                    id
+                    email
+                    firstName
+                    isActive
+                    lastName
+                    avatar(size: 128) {
+                      url
+                      __typename
+                    }
+                    __typename
+                  }
+                  __typename
+                }
+                __typename
+              }
+            }
+            \`\`\`
+            **Variables:**
+            \`\`\`json
+            {
+              "input": {
+                "addPermissions": [
+                  "MANAGE_TRANSLATIONS",
+                  "MANAGE_TAXES",
+                  "MANAGE_STAFF",
+                  "MANAGE_SHIPPING",
+                  "MANAGE_SETTINGS",
+                  "MANAGE_DISCOUNTS",
+                  "MANAGE_PRODUCTS",
+                  "MANAGE_PRODUCT_TYPES_AND_ATTRIBUTES",
+                  "MANAGE_PLUGINS",
+                  "MANAGE_PAGES",
+                  "MANAGE_PAGE_TYPES_AND_ATTRIBUTES",
+                  "MANAGE_ORDERS",
+                  "MANAGE_ORDERS_IMPORT",
+                  "MANAGE_OBSERVABILITY",
+                  "MANAGE_MENUS",
+                  "MANAGE_GIFT_CARD",
+                  "MANAGE_USERS",
+                  "MANAGE_CHECKOUTS",
+                  "MANAGE_CHANNELS",
+                  "MANAGE_APPS",
+                  "HANDLE_CHECKOUTS",
+                  "HANDLE_PAYMENTS",
+                  "HANDLE_TAXES",
+                  "IMPERSONATE_USER"
+                ],
+                "addUsers": [],
+                "name": "Vendor admin",
+                "addChannels": [
+                  "Q2hhbm5lbDoy",
+                  "Q2hhbm5lbDox"
+                ],
+                "restrictedAccessToChannels": false
+              }
+            }
+            \`\`\`
+            **Response:**
+            \`\`\`json
+            {
+              "data": {
+                "permissionGroupCreate": {
+                  "errors": [],
+                  "group": {
+                    "id": "R3JvdXA6NjE=",
+                    "name": "Vendor admin",
+                    "userCanManage": true,
+                    "users": [],
+                    "restrictedAccessToChannels": false,
+                    "accessibleChannels": [
+                      {
+                        "id": "Q2hhbm5lbDox",
+                        "isActive": true,
+                        "name": "Default Channel",
+                        "slug": "default-channel",
+                        "currencyCode": "USD",
+                        "defaultCountry": {
+                          "code": "US",
+                          "country": "United States",
+                          "__typename": "Country"
+                        },
+                        "stockSettings": {
+                          "allocationStrategy": "PRIORITIZE_SORTING",
+                          "__typename": "StockSettings"
+                        },
+                        "__typename": "Channel"
+                      },
+                      {
+                        "id": "Q2hhbm5lbDoy",
+                        "isActive": true,
+                        "name": "EU Channel",
+                        "slug": "eu-channel",
+                        "currencyCode": "EUR",
+                        "defaultCountry": {
+                          "code": "DE",
+                          "country": "Germany",
+                          "__typename": "Country"
+                        },
+                        "stockSettings": {
+                          "allocationStrategy": "PRIORITIZE_SORTING",
+                          "__typename": "StockSettings"
+                        },
+                        "__typename": "Channel"
+                      }
+                    ],
+                    "permissions": [
+                      {
+                        "code": "MANAGE_TRANSLATIONS",
+                        "name": "Manage Translations",
+                        "__typename": "Permission"
+                      },
+                      {
+                        "code": "MANAGE_TAXES",
+                        "name": "Manage Taxes",
+                        "__typename": "Permission"
+                      }
+                    ],
+                    "__typename": "Group"
+                  },
+                  "__typename": "PermissionGroupCreatePayload"
+                }
+              }
+            }
+            \`\`\`
+
+            ## 30. Staff Creation
+            **Mutation:**
+            \`\`\`graphql
+            mutation {
+              staffCreate(
+                input: {
+                  email: "johnpal5@example.com"
+                  firstName: "John"
+                  lastName: "Pal"
+                  isActive: true
+                  addGroups: ["R3JvdXA6NjE="]
+                }
+              ) {
+                errors {
+                  field
+                  message
+                }
+                user {
+                  id
+                  email
+                  firstName
+                  lastName
+                  isActive
+                  permissionGroups {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+            \`\`\`
+            **Response:**
+            \`\`\`json
+            {
+              "data": {
+                "staffCreate": {
+                  "errors": [],
+                  "user": {
+                    "id": "VXNlcjoxMjM=",
+                    "email": "johnpal5@example.com",
+                    "firstName": "John",
+                    "lastName": "Pal",
+                    "isActive": true,
+                    "permissionGroups": [
+                      {
+                        "id": "R3JvdXA6NjE=",
+                        "name": "Vendor admin"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+            \`\`\`
+
+            ## 31. Query Permission Groups
+            **Query:**
+            \`\`\`graphql
+            query {
+              permissionGroups(first: 50) {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+            \`\`\`
+            **Response:**
+            \`\`\`json
+            {
+              "data": {
+                "permissionGroups": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "R3JvdXA6NjE=",
+                        "name": "Vendor admin"
+                      }
+                    },
+                    {
+                      "node": {
+                        "id": "R3JvdXA6NjI=",
+                        "name": "Store Manager"
+                      }
+                    }
+                  ]
                 }
               }
             }

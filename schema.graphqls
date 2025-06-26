@@ -1,4 +1,5 @@
-# schema.graphqls (updated to fix duplicate ProductVariantReorderAttributeValuesPayload)
+
+# schema.graphqls (updated to include PermissionGroupCreate, staffCreate, and permissionGroups)
 
 """
 Root query type for Saleor GraphQL API.
@@ -8,9 +9,21 @@ type Query {
   Retrieves a list of product categories with pagination.
   """
   categories(
+    """
+    Number of items to fetch after the cursor.
+    """
     first: Int
+    """
+    Cursor for forward pagination.
+    """
     after: String
+    """
+    Number of items to fetch before the cursor.
+    """
     last: Int
+    """
+    Cursor for backward pagination.
+    """
     before: String
   ): CategoryConnection!
   """
@@ -18,12 +31,45 @@ type Query {
   """
   channels: [Channel!]!
   """
+  Retrieves a list of permission groups with pagination.
+  """
+  permissionGroups(
+    """
+    Number of items to fetch after the cursor.
+    """
+    first: Int
+    """
+    Cursor for forward pagination.
+    """
+    after: String
+    """
+    Number of items to fetch before the cursor.
+    """
+    last: Int
+    """
+    Cursor for backward pagination.
+    """
+    before: String
+  ): PermissionGroupConnection!
+  """
   Retrieves a list of product types with pagination.
   """
   productTypes(
+    """
+    Number of items to fetch after the cursor.
+    """
     first: Int
+    """
+    Cursor for forward pagination.
+    """
     after: String
+    """
+    Number of items to fetch before the cursor.
+    """
     last: Int
+    """
+    Cursor for backward pagination.
+    """
     before: String
   ): ProductTypeConnection!
 }
@@ -32,6 +78,31 @@ type Query {
 Root mutation type for Saleor GraphQL API.
 """
 type Mutation {
+  """
+  Cancels an order.
+  """
+  orderCancel(id: ID!): OrderCancelPayload!
+  """
+  Refunds an order.
+  """
+  orderRefund(id: ID!, amount: PositiveDecimal!): OrderRefundPayload!
+  """
+  Updates an order.
+  """
+  orderUpdate(id: ID, externalReference: String, input: OrderUpdateInput!): OrderUpdatePayload!
+  """
+  Voids an order.
+  """
+  orderVoid(id: ID!): OrderVoidPayload!
+  """
+  Creates a new permission group.
+  """
+  permissionGroupCreate(
+    """
+    Input data for permission group creation.
+    """
+    input: PermissionGroupCreateInput!
+  ): PermissionGroupCreatePayload!
   """
   Updates channel listings for a product.
   """
@@ -46,57 +117,9 @@ type Mutation {
     input: ProductCreateInput!
   ): ProductCreatePayload!
   """
-  Translates a product into another language.
-  """
-  productTranslate(
-    id: ID!
-    languageCode: LanguageCodeEnum!
-    input: ProductTranslationInput!
-  ): ProductTranslatePayload!
-  """
-  Updates an existing product.
-  """
-  productUpdate(
-    id: ID!
-    input: ProductUpdateInput!
-  ): ProductUpdatePayload!
-  """
-  Creates a new product variant.
-  """
-  productVariantCreate(
-    input: ProductVariantCreateInput!
-  ): ProductVariantCreatePayload!
-  """
-  Creates an authentication token for a user.
-  """
-  tokenCreate(
-    email: String!
-    password: String!
-  ): TokenCreatePayload!
-  """
-  Deletes a product variant.
-  """
-  productVariantDelete(id: ID, externalReference: String, sku: String): ProductVariantDeletePayload!
-  """
-  Updates an existing product variant.
-  """
-  productVariantUpdate(id: ID, externalReference: String, sku: String, input: ProductVariantInput!): ProductVariantUpdatePayload!
-  """
-  Reorders product variants for a product.
-  """
-  productVariantReorder(productId: ID!, moves: [ReorderInput!]!): ProductVariantReorderPayload!
-  """
-  Translates a product variant into another language.
-  """
-  productVariantTranslate(id: ID!, languageCode: LanguageCodeEnum!, input: NameTranslationInput!): ProductVariantTranslatePayload!
-  """
   Creates multiple product variants in bulk.
   """
   productVariantBulkCreate(product: ID!, variants: [ProductVariantBulkCreateInput!]!, errorPolicy: ErrorPolicyEnum): ProductVariantBulkCreatePayload!
-  """
-  Updates multiple product variants in bulk.
-  """
-  productVariantBulkUpdate(product: ID!, variants: [ProductVariantBulkCreateInput!]!, errorPolicy: ErrorPolicyEnum): ProductVariantBulkUpdatePayload!
   """
   Deletes multiple product variants in bulk.
   """
@@ -105,6 +128,36 @@ type Mutation {
   Translates multiple product variants in bulk.
   """
   productVariantBulkTranslate(translations: [ProductVariantBulkTranslateInput!]!): ProductVariantBulkTranslatePayload!
+  """
+  Updates multiple product variants in bulk.
+  """
+  productVariantBulkUpdate(product: ID!, variants: [ProductVariantBulkCreateInput!]!, errorPolicy: ErrorPolicyEnum): ProductVariantBulkUpdatePayload!
+  """
+  Updates channel listings for a product variant.
+  """
+  productVariantChannelListingUpdate(id: ID, input: [ProductVariantChannelListingAddInput!]!): ProductVariantChannelListingUpdatePayload!
+  """
+  Creates a new product variant.
+  """
+  productVariantCreate(
+    input: ProductVariantCreateInput!
+  ): ProductVariantCreatePayload!
+  """
+  Deletes a product variant.
+  """
+  productVariantDelete(id: ID, externalReference: String, sku: String): ProductVariantDeletePayload!
+  """
+  Deactivates preorder for a product variant.
+  """
+  productVariantPreorderDeactivate(id: ID!): ProductVariantPreorderDeactivatePayload!
+  """
+  Reorders product variants for a product.
+  """
+  productVariantReorder(productId: ID!, moves: [ReorderInput!]!): ProductVariantReorderPayload!
+  """
+  Reorders attribute values for a product variant.
+  """
+  productVariantReorderAttributeValues(variantId: ID!, attributeId: ID!, moves: [ReorderInput!]!): ProductVariantReorderAttributeValuesPayload!
   """
   Sets a default variant for a product.
   """
@@ -122,694 +175,75 @@ type Mutation {
   """
   productVariantStocksUpdate(variantId: ID, sku: String, stocks: [StockInput!]!): ProductVariantStocksUpdatePayload!
   """
-  Deactivates preorder for a product variant.
+  Translates a product variant into another language.
   """
-  productVariantPreorderDeactivate(id: ID!): ProductVariantPreorderDeactivatePayload!
+  productVariantTranslate(id: ID!, languageCode: LanguageCodeEnum!, input: NameTranslationInput!): ProductVariantTranslatePayload!
   """
-  Updates channel listings for a product variant.
+  Updates an existing product variant.
   """
-  productVariantChannelListingUpdate(id: ID, input: [ProductVariantChannelListingAddInput!]!): ProductVariantChannelListingUpdatePayload!
+  productVariantUpdate(id: ID, externalReference: String, sku: String, input: ProductVariantInput!): ProductVariantUpdatePayload!
   """
-  Reorders attribute values for a product variant.
+  Creates a new staff user.
   """
-  productVariantReorderAttributeValues(variantId: ID!, attributeId: ID!, moves: [ReorderInput!]!): ProductVariantReorderAttributeValuesPayload!
+  staffCreate(
+    """
+    Input data for staff user creation.
+    """
+    input: StaffCreateInput!
+  ): StaffCreatePayload!
   """
-  Voids an order.
+  Creates an authentication token for a user.
   """
-  orderVoid(id: ID!): OrderVoidPayload!
+  tokenCreate(
+    email: String!
+    password: String!
+  ): TokenCreatePayload!
   """
-  Cancels an order.
+  Translates a product into another language.
   """
-  orderCancel(id: ID!): OrderCancelPayload!
+  productTranslate(
+    id: ID!
+    languageCode: LanguageCodeEnum!
+    input: ProductTranslationInput!
+  ): ProductTranslatePayload!
   """
-  Refunds an order.
+  Updates an existing product.
   """
-  orderRefund(id: ID!, amount: PositiveDecimal!): OrderRefundPayload!
-  """
-  Updates an order.
-  """
-  orderUpdate(id: ID, externalReference: String, input: OrderUpdateInput!): OrderUpdatePayload!
-}
-
-"""
-Payload for token creation mutation.
-"""
-type TokenCreatePayload {
-  token: String
-  user: User
-}
-
-"""
-Payload for product creation mutation.
-"""
-type ProductCreatePayload {
-  errors: [Error!]!
-  product: Product
-}
-
-"""
-Payload for product channel listing update mutation.
-"""
-type ProductChannelListingUpdatePayload {
-  errors: [Error!]!
-  product: Product
-}
-
-"""
-Payload for product variant creation mutation.
-"""
-type ProductVariantCreatePayload {
-  errors: [Error!]!
-  productVariant: ProductVariant
-}
-
-"""
-Payload for product update mutation.
-"""
-type ProductUpdatePayload {
-  errors: [Error!]!
-  product: Product
-}
-
-"""
-Payload for product translation mutation.
-"""
-type ProductTranslatePayload {
-  errors: [Error!]!
-  product: Product
-}
-
-"""
-Payload for product variant deletion mutation.
-"""
-type ProductVariantDeletePayload {
-  errors: [Error!]!
-  productVariant: ProductVariant
-}
-
-"""
-Payload for product variant update mutation.
-"""
-type ProductVariantUpdatePayload {
-  errors: [Error!]!
-  productVariant: ProductVariant
-}
-
-"""
-Payload for product variant reorder mutation.
-"""
-type ProductVariantReorderPayload {
-  errors: [Error!]!
-  product: Product
-}
-
-"""
-Payload for product variant translation mutation.
-"""
-type ProductVariantTranslatePayload {
-  errors: [Error!]!
-  translation: ProductVariantTranslation
-}
-
-"""
-Payload for bulk product variant creation mutation.
-"""
-type ProductVariantBulkCreatePayload {
-  errors: [Error!]!
-  productVariants: [ProductVariant!]
-}
-
-"""
-Payload for bulk product variant update mutation.
-"""
-type ProductVariantBulkUpdatePayload {
-  errors: [Error!]!
-  productVariants: [ProductVariant!]
-}
-
-"""
-Payload for bulk product variant deletion mutation.
-"""
-type ProductVariantBulkDeletePayload {
-  errors: [Error!]!
-  deletedCount: Int!
-}
-
-"""
-Payload for bulk product variant translation mutation.
-"""
-type ProductVariantBulkTranslatePayload {
-  errors: [Error!]!
-  translations: [ProductVariantTranslation!]
-}
-
-"""
-Payload for setting default product variant mutation.
-"""
-type ProductVariantSetDefaultPayload {
-  errors: [Error!]!
-  product: Product
-}
-
-"""
-Payload for creating product variant stocks mutation.
-"""
-type ProductVariantStocksCreatePayload {
-  errors: [Error!]!
-  productVariant: ProductVariant
-}
-
-"""
-Payload for deleting product variant stocks mutation.
-"""
-type ProductVariantStocksDeletePayload {
-  errors: [Error!]!
-  productVariant: ProductVariant
-}
-
-"""
-Payload for updating product variant stocks mutation.
-"""
-type ProductVariantStocksUpdatePayload {
-  errors: [Error!]!
-  productVariant: ProductVariant
-}
-
-"""
-Payload for deactivating product variant preorder mutation.
-"""
-type ProductVariantPreorderDeactivatePayload {
-  errors: [Error!]!
-  productVariant: ProductVariant
-}
-
-"""
-Payload for updating product variant channel listings mutation.
-"""
-type ProductVariantChannelListingUpdatePayload {
-  errors: [Error!]!
-  productVariant: ProductVariant
-}
-
-"""
-Payload for reordering product variant attribute values mutation.
-"""
-type ProductVariantReorderAttributeValuesPayload {
-  errors: [Error!]!
-  productVariant: ProductVariant
-}
-
-"""
-Payload for voiding an order mutation.
-"""
-type OrderVoidPayload {
-  errors: [Error!]!
-  order: Order
-}
-
-"""
-Payload for canceling an order mutation.
-"""
-type OrderCancelPayload {
-  errors: [Error!]!
-  order: Order
-}
-
-"""
-Payload for refunding an order mutation.
-"""
-type OrderRefundPayload {
-  errors: [Error!]!
-  order: Order
-}
-
-"""
-Payload for updating an order mutation.
-"""
-type OrderUpdatePayload {
-  errors: [Error!]!
-  order: Order
-}
-
-"""
-Connection type for product types, following Relay specification.
-"""
-type ProductTypeConnection {
-  edges: [ProductTypeEdge!]!
-  pageInfo: PageInfo!
-}
-
-"""
-Edge type for product types.
-"""
-type ProductTypeEdge {
-  node: ProductType!
-}
-
-"""
-Product type details.
-"""
-type ProductType {
-  id: ID!
-  name: String!
-}
-
-"""
-Connection type for categories, following Relay specification.
-"""
-type CategoryConnection {
-  edges: [CategoryEdge!]!
-  pageInfo: PageInfo!
-}
-
-"""
-Edge type for categories.
-"""
-type CategoryEdge {
-  node: Category!
-}
-
-"""
-Category details.
-"""
-type Category {
-  id: ID!
-  name: String!
-}
-
-"""
-Channel details.
-"""
-type Channel {
-  id: ID!
-  name: String!
-}
-
-"""
-User details.
-"""
-type User {
-  email: String!
-  id: ID!
-}
-
-"""
-Product details.
-"""
-type Product {
-  channelListings: [ChannelListing!]
-  id: ID!
-  name: String!
-  translation(languageCode: LanguageCodeEnum!): ProductTranslation
-  defaultVariant: ProductVariant
-}
-
-"""
-Product variant details.
-"""
-type ProductVariant {
-  id: ID!
-  name: String!
-  sku: String
-  product: Product!
-  trackInventory: Boolean!
-  quantityLimitPerCustomer: Int
-  weight: Weight
-  metadata: [MetadataItem!]!
-  privateMetadata: [MetadataItem!]!
-  externalReference: String
-  channelListings: [ProductVariantChannelListing!]
-  attributes(variantSelection: VariantAttributeScope): [SelectedAttribute!]!
-  stocks: [Stock!]
-  quantityAvailable: Int
-  preorder: PreorderData
-  isPreorder: Boolean
-  preorderGlobalThreshold: Int
-  preorderEndDate: DateTime
-}
-
-"""
-Channel listing details for a product.
-"""
-type ChannelListing {
-  channel: Channel!
-  isPublished: Boolean!
-  publishedAt: String
-  visibleInListings: Boolean
-}
-
-"""
-Translation details for a product.
-"""
-type ProductTranslation {
-  name: String!
-}
-
-"""
-Product variant translation details.
-"""
-type ProductVariantTranslation {
-  name: String!
-  language: Language
-}
-
-"""
-Language details.
-"""
-type Language {
-  code: LanguageCodeEnum!
-}
-
-"""
-Error details for mutations.
-"""
-type Error {
-  field: String
-  message: String
-  code: String
-}
-
-"""
-Pagination information for Relay connections.
-"""
-type PageInfo {
-  endCursor: String
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-}
-
-"""
-Input for creating a product.
-"""
-input ProductCreateInput {
-  category: ID!
-  name: String!
-  productType: ID!
-  slug: String!
-}
-
-"""
-Input for updating a product.
-"""
-input ProductUpdateInput {
-  category: ID
-  name: String
-  slug: String
-  productType: ID
-}
-
-"""
-Input for updating product channel listings.
-"""
-input ProductChannelListingUpdateInput {
-  updateChannels: [ChannelUpdateInput!]!
-}
-
-"""
-Input for updating a channel.
-"""
-input ChannelUpdateInput {
-  availableForPurchase: Boolean
-  availableForPurchaseDate: String
-  channelId: ID!
-  isPublished: Boolean
-  publicationDate: String
-  publishedAt: String
-  visibleInListings: Boolean
-}
-
-"""
-Input for creating a product variant.
-"""
-input ProductVariantCreateInput {
-  attributes: [AttributeValueInput!]!
-  sku: String
-  name: String!
-  trackInventory: Boolean
-  weight: WeightScalar
-  preorder: PreorderSettingsInput
-  quantityLimitPerCustomer: Int
-  metadata: [MetadataInput!]
-  privateMetadata: [MetadataInput!]
-  externalReference: String
-  product: ID!
-  stocks: [StockInput!]
-}
-
-"""
-Input for updating a product variant.
-"""
-input ProductVariantInput {
-  name: String
-  sku: String
-  trackInventory: Boolean
-  weight: WeightScalar
-  preorder: PreorderSettingsInput
-  quantityLimitPerCustomer: Int
-  metadata: [MetadataInput!]
-  privateMetadata: [MetadataInput!]
-  externalReference: String
-}
-
-"""
-Input for reordering items.
-"""
-input ReorderInput {
-  id: ID!
-  sortOrder: Int
-}
-
-"""
-Input for translating a product.
-"""
-input ProductTranslationInput {
-  name: String!
-}
-
-"""
-Input for translating a product variant name.
-"""
-input NameTranslationInput {
-  name: String!
-}
-
-"""
-Input for bulk product variant creation.
-"""
-input ProductVariantBulkCreateInput {
-  attributes: [AttributeValueInput!]!
-  sku: String
-  name: String
-  trackInventory: Boolean
-  weight: WeightScalar
-  preorder: PreorderSettingsInput
-  quantityLimitPerCustomer: Int
-  metadata: [MetadataInput!]
-  privateMetadata: [MetadataInput!]
-  externalReference: String
-  stocks: [StockInput!]
-}
-
-"""
-Input for bulk product variant translation.
-"""
-input ProductVariantBulkTranslateInput {
-  id: ID!
-  languageCode: LanguageCodeEnum!
-  name: String!
-}
-
-"""
-Input for updating product variant channel listings.
-"""
-input ProductVariantChannelListingAddInput {
-  channelId: ID!
-  price: PositiveDecimal!
-  costPrice: PositiveDecimal
-  priorPrice: PositiveDecimal
-  preorderThreshold: Int
-}
-
-"""
-Input for stock details.
-"""
-input StockInput {
-  warehouse: ID!
-  quantity: Int!
-}
-
-"""
-Input for preorder settings.
-"""
-input PreorderSettingsInput {
-  globalThreshold: Int
-  endDate: DateTime
-}
-
-"""
-Input for metadata.
-"""
-input MetadataInput {
-  key: String!
-  value: String!
-}
-
-"""
-Input for updating an order.
-"""
-input OrderUpdateInput {
-  billingAddress: AddressInput
-  userEmail: String
-  shippingAddress: AddressInput
-  externalReference: String
-  metadata: [MetadataInput!]
-  privateMetadata: [MetadataInput!]
-  languageCode: LanguageCodeEnum
-}
-
-"""
-Input for address details.
-"""
-input AddressInput {
-  streetAddress1: String
-  city: String
-  postalCode: String
-  country: String
-}
-
-"""
-Input for attribute values.
-"""
-input AttributeValueInput {
-  id: ID
-  values: [String!]
-}
-
-"""
-Language codes for translations.
-"""
-enum LanguageCodeEnum {
-  EN
-  FR
-}
-
-"""
-Enum for error handling policies.
-"""
-enum ErrorPolicyEnum {
-  REJECT_EVERYTHING
-  IGNORE_FAILED
-}
-
-"""
-Enum for variant attribute scope.
-"""
-enum VariantAttributeScope {
-  ALL
-  VARIANT
-}
-
-"""
-Weight scalar type.
-"""
-scalar WeightScalar
-
-"""
-Positive decimal scalar type.
-"""
-scalar PositiveDecimal
-
-"""
-DateTime scalar type.
-"""
-scalar DateTime
-
-"""
-Order details.
-"""
-type Order {
-  id: ID!
-  status: String!
-  totalRefunded: TaxedMoney
-  billingAddress: Address
-  userEmail: String
+  productUpdate(
+    id: ID!
+    input: ProductUpdateInput!
+  ): ProductUpdatePayload!
 }
 
 """
 Address details.
 """
 type Address {
+  """
+  First line of the street address.
+  """
   streetAddress1: String
+  """
+  City of the address.
+  """
   city: String
+  """
+  Postal code of the address.
+  """
   postalCode: String
-}
-
-"""
-Taxed money type.
-"""
-type TaxedMoney {
-  amount: Float!
-  currency: String!
-}
-
-"""
-Product variant channel listing details.
-"""
-type ProductVariantChannelListing {
-  channel: Channel!
-  price: Money!
-  costPrice: Money
-  priorPrice: Money
-  preorderThreshold: Int
-}
-
-"""
-Money type.
-"""
-type Money {
-  amount: Float!
-  currency: String!
-}
-
-"""
-Preorder data type.
-"""
-type PreorderData {
-  globalThreshold: Int
-  endDate: DateTime
-}
-
-"""
-Stock details.
-"""
-type Stock {
-  warehouse: Warehouse!
-  quantity: Int!
-  quantityAllocated: Int
-}
-
-"""
-Warehouse details.
-"""
-type Warehouse {
-  id: ID!
-  name: String!
-}
-
-"""
-Selected attribute details.
-"""
-type SelectedAttribute {
-  attribute: Attribute!
-  values: [AttributeValue!]!
 }
 
 """
 Attribute details.
 """
 type Attribute {
+  """
+  Unique identifier.
+  """
   id: ID!
+  """
+  Name of the attribute.
+  """
   name: String!
 }
 
@@ -817,22 +251,1569 @@ type Attribute {
 Attribute value details.
 """
 type AttributeValue {
+  """
+  Unique identifier.
+  """
   id: ID!
+  """
+  Name of the attribute value.
+  """
   name: String!
+}
+
+"""
+Category details.
+"""
+type Category {
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the category.
+  """
+  name: String!
+}
+
+"""
+Connection type for categories, following Relay specification.
+"""
+type CategoryConnection {
+  """
+  List of category edges.
+  """
+  edges: [CategoryEdge!]!
+  """
+  Pagination information.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+Edge type for categories.
+"""
+type CategoryEdge {
+  """
+  Category node.
+  """
+  node: Category!
+}
+
+"""
+Channel details.
+"""
+type Channel {
+  """
+  Currency code of the channel.
+  """
+  currencyCode: String!
+  """
+  Default country settings.
+  """
+  defaultCountry: Country!
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Whether the channel is active.
+  """
+  isActive: Boolean!
+  """
+  Name of the channel.
+  """
+  name: String!
+  """
+  Slug of the channel.
+  """
+  slug: String!
+  """
+  Stock settings for the channel.
+  """
+  stockSettings: StockSettings!
+}
+
+"""
+Channel listing details for a product.
+"""
+type ChannelListing {
+  """
+  Associated channel.
+  """
+  channel: Channel!
+  """
+  Whether the product is published.
+  """
+  isPublished: Boolean!
+  """
+  Publication timestamp.
+  """
+  publishedAt: String
+  """
+  Whether the product is visible in listings.
+  """
+  visibleInListings: Boolean
+}
+
+"""
+Country details.
+"""
+type Country {
+  """
+  Country code.
+  """
+  code: String!
+  """
+  Country name.
+  """
+  country: String!
+}
+
+"""
+Error details for mutations.
+"""
+type Error {
+  """
+  Error code.
+  """
+  code: String
+  """
+  Field causing the error.
+  """
+  field: String
+  """
+  Error message.
+  """
+  message: String
+}
+
+"""
+Permission group details.
+"""
+type Group {
+  """
+  List of accessible channels.
+  """
+  accessibleChannels: [Channel!]!
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the permission group.
+  """
+  name: String!
+  """
+  List of permissions in the group.
+  """
+  permissions: [Permission!]!
+  """
+  Whether access is restricted to specific channels.
+  """
+  restrictedAccessToChannels: Boolean!
+  """
+  Whether the user can manage this group.
+  """
+  userCanManage: Boolean!
+  """
+  List of users in the group.
+  """
+  users: [User!]!
+}
+
+"""
+Image details.
+"""
+type Image {
+  """
+  URL of the image.
+  """
+  url: String!
+}
+
+"""
+Language details.
+"""
+type Language {
+  """
+  Language code.
+  """
+  code: LanguageCodeEnum!
 }
 
 """
 Metadata item type.
 """
 type MetadataItem {
+  """
+  Metadata key.
+  """
   key: String!
+  """
+  Metadata value.
+  """
   value: String!
+}
+
+"""
+Money type.
+"""
+type Money {
+  """
+  Monetary amount.
+  """
+  amount: Float!
+  """
+  Currency code.
+  """
+  currency: String!
+}
+
+"""
+Order details.
+"""
+type Order {
+  """
+  Billing address of the order.
+  """
+  billingAddress: Address
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Status of the order.
+  """
+  status: String!
+  """
+  Total refunded amount.
+  """
+  totalRefunded: TaxedMoney
+  """
+  Email of the user who placed the order.
+  """
+  userEmail: String
+}
+
+"""
+Payload for canceling an order mutation.
+"""
+type OrderCancelPayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Canceled order.
+  """
+  order: Order
+}
+
+"""
+Payload for refunding an order mutation.
+"""
+type OrderRefundPayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Refunded order.
+  """
+  order: Order
+}
+
+"""
+Payload for updating an order mutation.
+"""
+type OrderUpdatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Updated order.
+  """
+  order: Order
+}
+
+"""
+Payload for voiding an order mutation.
+"""
+type OrderVoidPayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Voided order.
+  """
+  order: Order
+}
+
+"""
+Pagination information for Relay connections.
+"""
+type PageInfo {
+  """
+  Cursor for the last item in the current page.
+  """
+  endCursor: String
+  """
+  Whether there is a next page.
+  """
+  hasNextPage: Boolean!
+  """
+  Whether there is a previous page.
+  """
+  hasPreviousPage: Boolean!
+  """
+  Cursor for the first item in the current page.
+  """
+  startCursor: String
+}
+
+"""
+Permission details.
+"""
+type Permission {
+  """
+  Code of the permission.
+  """
+  code: String!
+  """
+  Name of the permission.
+  """
+  name: String!
+}
+
+"""
+Error details for permission group mutations.
+"""
+type PermissionGroupError {
+  """
+  Error code.
+  """
+  code: String!
+  """
+  Field causing the error.
+  """
+  field: String
+  """
+  Error message.
+  """
+  message: String
+}
+
+"""
+Connection type for permission groups, following Relay specification.
+"""
+type PermissionGroupConnection {
+  """
+  List of permission group edges.
+  """
+  edges: [PermissionGroupEdge!]!
+  """
+  Pagination information.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+Edge type for permission groups.
+"""
+type PermissionGroupEdge {
+  """
+  Permission group node.
+  """
+  node: Group!
+}
+
+"""
+Payload for permission group creation mutation.
+"""
+type PermissionGroupCreatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [PermissionGroupError!]!
+  """
+  Created permission group.
+  """
+  group: Group
+  """
+  Type name of the payload.
+  """
+  __typename: String!
+}
+
+"""
+Payload for bulk product variant creation mutation.
+"""
+type ProductVariantBulkCreatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Created product variants.
+  """
+  productVariants: [ProductVariant!]
+}
+
+"""
+Payload for bulk product variant deletion mutation.
+"""
+type ProductVariantBulkDeletePayload {
+  """
+  Number of deleted variants.
+  """
+  deletedCount: Int!
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+}
+
+"""
+Payload for bulk product variant translation mutation.
+"""
+type ProductVariantBulkTranslatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Translated product variants.
+  """
+  translations: [ProductVariantTranslation!]
+}
+
+"""
+Payload for bulk product variant update mutation.
+"""
+type ProductVariantBulkUpdatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Updated product variants.
+  """
+  productVariants: [ProductVariant!]
+}
+
+"""
+Payload for product channel listing update mutation.
+"""
+type ProductChannelListingUpdatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Updated product.
+  """
+  product: Product
+}
+
+"""
+Payload for product creation mutation.
+"""
+type ProductCreatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Created product.
+  """
+  product: Product
+}
+
+"""
+Product details.
+"""
+type Product {
+  """
+  List of channel listings for the product.
+  """
+  channelListings: [ChannelListing!]
+  """
+  Default product variant.
+  """
+  defaultVariant: ProductVariant
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the product.
+  """
+  name: String!
+  """
+  Translation of the product in a specified language.
+  """
+  translation(
+    """
+    Language code for translation.
+    """
+    languageCode: LanguageCodeEnum!
+  ): ProductTranslation
+}
+
+"""
+Translation details for a product.
+"""
+type ProductTranslation {
+  """
+  Translated name.
+  """
+  name: String!
+}
+
+"""
+Product type details.
+"""
+type ProductType {
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the product type.
+  """
+  name: String!
+}
+
+"""
+Connection type for product types, following Relay specification.
+"""
+type ProductTypeConnection {
+  """
+  List of product type edges.
+  """
+  edges: [ProductTypeEdge!]!
+  """
+  Pagination information.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+Edge type for product types.
+"""
+type ProductTypeEdge {
+  """
+  Product type node.
+  """
+  node: ProductType!
+}
+
+"""
+Payload for product translation mutation.
+"""
+type ProductTranslatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Translated product.
+  """
+  product: Product
+}
+
+"""
+Payload for product update mutation.
+"""
+type ProductUpdatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Updated product.
+  """
+  product: Product
+}
+
+"""
+Product variant channel listing details.
+"""
+type ProductVariantChannelListing {
+  """
+  Associated channel.
+  """
+  channel: Channel!
+  """
+  Cost price of the variant.
+  """
+  costPrice: Money
+  """
+  Price of the variant.
+  """
+  price: Money!
+  """
+  Previous price of the variant.
+  """
+  priorPrice: Money
+  """
+  Preorder threshold for the variant.
+  """
+  preorderThreshold: Int
+}
+
+"""
+Payload for updating product variant channel listings mutation.
+"""
+type ProductVariantChannelListingUpdatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Updated product variant.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Payload for product variant creation mutation.
+"""
+type ProductVariantCreatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Created product variant.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Payload for product variant deletion mutation.
+"""
+type ProductVariantDeletePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Deleted product variant.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Preorder data type.
+"""
+type PreorderData {
+  """
+  Global preorder threshold.
+  """
+  globalThreshold: Int
+  """
+  Preorder end date.
+  """
+  endDate: DateTime
+}
+
+"""
+Payload for deactivating product variant preorder mutation.
+"""
+type ProductVariantPreorderDeactivatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Product variant with deactivated preorder.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Payload for product variant reorder mutation.
+"""
+type ProductVariantReorderPayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Product with reordered variants.
+  """
+  product: Product
+}
+
+"""
+Payload for reordering product variant attribute values mutation.
+"""
+type ProductVariantReorderAttributeValuesPayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Product variant with reordered attribute values.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Payload for setting default product variant mutation.
+"""
+type ProductVariantSetDefaultPayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Product with updated default variant.
+  """
+  product: Product
+}
+
+"""
+Stock details.
+"""
+type Stock {
+  """
+  Quantity allocated in the stock.
+  """
+  quantityAllocated: Int
+  """
+  Available quantity in the stock.
+  """
+  quantity: Int!
+  """
+  Associated warehouse.
+  """
+  warehouse: Warehouse!
+}
+
+"""
+Payload for creating product variant stocks mutation.
+"""
+type ProductVariantStocksCreatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Product variant with created stocks.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Payload for deleting product variant stocks mutation.
+"""
+type ProductVariantStocksDeletePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Product variant with deleted stocks.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Payload for updating product variant stocks mutation.
+"""
+type ProductVariantStocksUpdatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Product variant with updated stocks.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Payload for product variant translation mutation.
+"""
+type ProductVariantTranslatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Translated product variant.
+  """
+  translation: ProductVariantTranslation
+}
+
+"""
+Product variant translation details.
+"""
+type ProductVariantTranslation {
+  """
+  Language of the translation.
+  """
+  language: Language
+  """
+  Translated name.
+  """
+  name: String!
+}
+
+"""
+Payload for product variant update mutation.
+"""
+type ProductVariantUpdatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Updated product variant.
+  """
+  productVariant: ProductVariant
+}
+
+"""
+Product variant details.
+"""
+type ProductVariant {
+  """
+  Selected attributes for the variant.
+  """
+  attributes(
+    """
+    Scope of attributes to include.
+    """
+    variantSelection: VariantAttributeScope
+  ): [SelectedAttribute!]!
+  """
+  Channel listings for the variant.
+  """
+  channelListings: [ProductVariantChannelListing!]
+  """
+  External reference for the variant.
+  """
+  externalReference: String
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Whether the variant is in preorder.
+  """
+  isPreorder: Boolean
+  """
+  Metadata for the variant.
+  """
+  metadata: [MetadataItem!]!
+  """
+  Name of the variant.
+  """
+  name: String!
+  """
+  Preorder settings for the variant.
+  """
+  preorder: PreorderData
+  """
+  Preorder end date.
+  """
+  preorderEndDate: DateTime
+  """
+  Global preorder threshold.
+  """
+  preorderGlobalThreshold: Int
+  """
+  Product associated with the variant.
+  """
+  product: Product!
+  """
+  Maximum quantity per customer.
+  """
+  quantityLimitPerCustomer: Int
+  """
+  Available quantity across all stocks.
+  """
+  quantityAvailable: Int
+  """
+  Stock keeping unit.
+  """
+  sku: String
+  """
+  Stock details for the variant.
+  """
+  stocks: [Stock!]
+  """
+  Whether inventory is tracked.
+  """
+  trackInventory: Boolean!
+  """
+  Weight of the variant.
+  """
+  weight: Weight
+}
+
+"""
+Selected attribute details.
+"""
+type SelectedAttribute {
+  """
+  Associated attribute.
+  """
+  attribute: Attribute!
+  """
+  List of attribute values.
+  """
+  values: [AttributeValue!]!
+}
+
+"""
+Payload for staff user creation mutation.
+"""
+type StaffCreatePayload {
+  """
+  List of errors, if any.
+  """
+  errors: [Error!]!
+  """
+  Created staff user.
+  """
+  user: User
+}
+
+"""
+Stock settings for a channel.
+"""
+type StockSettings {
+  """
+  Strategy for allocating stock.
+  """
+  allocationStrategy: String!
+}
+
+"""
+Taxed money type.
+"""
+type TaxedMoney {
+  """
+  Monetary amount.
+  """
+  amount: Float!
+  """
+  Currency code.
+  """
+  currency: String!
+}
+
+"""
+Token creation payload.
+"""
+type TokenCreatePayload {
+  """
+  Authentication token.
+  """
+  token: String
+  """
+  User associated with the token.
+  """
+  user: User
+}
+
+"""
+User details.
+"""
+type User {
+  """
+  Avatar image of the user.
+  """
+  avatar(size: Int!): Image
+  """
+  User email address.
+  """
+  email: String!
+  """
+  First name of the user.
+  """
+  firstName: String!
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Whether the user is active.
+  """
+  isActive: Boolean!
+  """
+  Last name of the user.
+  """
+  lastName: String!
+  """
+  Permission groups assigned to the user.
+  """
+  permissionGroups: [Group!]
+}
+
+"""
+Warehouse details.
+"""
+type Warehouse {
+  """
+  Unique identifier.
+  """
+  id: ID!
+  """
+  Name of the warehouse.
+  """
+  name: String!
 }
 
 """
 Weight type.
 """
 type Weight {
-  value: Float!
+  """
+  Unit of the weight.
+  """
   unit: String!
+  """
+  Weight value.
+  """
+  value: Float!
+}
+
+"""
+Input for address details.
+"""
+input AddressInput {
+  """
+  City of the address.
+  """
+  city: String
+  """
+  Country code.
+  """
+  country: String
+  """
+  Postal code of the address.
+  """
+  postalCode: String
+  """
+  First line of the street address.
+  """
+  streetAddress1: String
+}
+
+"""
+Input for attribute values.
+"""
+input AttributeValueInput {
+  """
+  Attribute ID.
+  """
+  id: ID
+  """
+  Attribute values.
+  """
+  values: [String!]
+}
+
+"""
+Input for creating a product.
+"""
+input ProductCreateInput {
+  """
+  Category ID for the product.
+  """
+  category: ID!
+  """
+  Product name.
+  """
+  name: String!
+  """
+  Product type ID.
+  """
+  productType: ID!
+  """
+  Product slug.
+  """
+  slug: String!
+}
+
+"""
+Input for creating a product variant.
+"""
+input ProductVariantCreateInput {
+  """
+  List of attributes.
+  """
+  attributes: [AttributeValueInput!]!
+  """
+  External reference for the variant.
+  """
+  externalReference: String
+  """
+  Metadata for the variant.
+  """
+  metadata: [MetadataInput!]
+  """
+  Variant name.
+  """
+  name: String!
+  """
+  Preorder settings for the variant.
+  """
+  preorder: PreorderSettingsInput
+  """
+  Private metadata for the variant.
+  """
+  privateMetadata: [MetadataInput!]
+  """
+  Product ID.
+  """
+  product: ID!
+  """
+  Maximum quantity per customer.
+  """
+  quantityLimitPerCustomer: Int
+  """
+  Stock keeping unit.
+  """
+  sku: String
+  """
+  Stock details for the variant.
+  """
+  stocks: [StockInput!]
+  """
+  Whether to track inventory.
+  """
+  trackInventory: Boolean
+  """
+  Weight of the variant.
+  """
+  weight: WeightScalar
+}
+
+"""
+Input for updating a product variant.
+"""
+input ProductVariantInput {
+  """
+  External reference for the variant.
+  """
+  externalReference: String
+  """
+  Metadata for the variant.
+  """
+  metadata: [MetadataInput!]
+  """
+  Variant name.
+  """
+  name: String
+  """
+  Preorder settings for the variant.
+  """
+  preorder: PreorderSettingsInput
+  """
+  Private metadata for the variant.
+  """
+  privateMetadata: [MetadataInput!]
+  """
+  Maximum quantity per customer.
+  """
+  quantityLimitPerCustomer: Int
+  """
+  Stock keeping unit.
+  """
+  sku: String
+  """
+  Whether to track inventory.
+  """
+  trackInventory: Boolean
+  """
+  Weight of the variant.
+  """
+  weight: WeightScalar
+}
+
+"""
+Input for updating product channel listings.
+"""
+input ProductChannelListingUpdateInput {
+  """
+  List of channel updates.
+  """
+  updateChannels: [ChannelUpdateInput!]!
+}
+
+"""
+Input for updating a channel.
+"""
+input ChannelUpdateInput {
+  """
+  Whether the product is available for purchase.
+  """
+  availableForPurchase: Boolean
+  """
+  Date when the product becomes available for purchase.
+  """
+  availableForPurchaseDate: String
+  """
+  Channel ID.
+  """
+  channelId: ID!
+  """
+  Whether the product is published.
+  """
+  isPublished: Boolean
+  """
+  Publication date.
+  """
+  publicationDate: String
+  """
+  Publication timestamp.
+  """
+  publishedAt: String
+  """
+  Whether the product is visible in listings.
+  """
+  visibleInListings: Boolean
+}
+
+"""
+Input for creating a permission group.
+"""
+input PermissionGroupCreateInput {
+  """
+  List of channel IDs to add to the group.
+  """
+  addChannels: [ID!]
+  """
+  List of permission codes to add.
+  """
+  addPermissions: [String!]
+  """
+  List of user IDs to add to the group.
+  """
+  addUsers: [ID!]
+  """
+  Name of the permission group.
+  """
+  name: String!
+  """
+  Whether access is restricted to specific channels.
+  """
+  restrictedAccessToChannels: Boolean!
+}
+
+"""
+Input for creating a staff user.
+"""
+input StaffCreateInput {
+  """
+  List of permission group IDs to assign to the user.
+  """
+  addGroups: [ID!]
+  """
+  Email address of the staff user.
+  """
+  email: String!
+  """
+  First name of the staff user.
+  """
+  firstName: String!
+  """
+  Whether the staff user is active.
+  """
+  isActive: Boolean!
+  """
+  Last name of the staff user.
+  """
+  lastName: String!
+}
+
+"""
+Input for updating an order.
+"""
+input OrderUpdateInput {
+  """
+  Billing address for the order.
+  """
+  billingAddress: AddressInput
+  """
+  External reference for the order.
+  """
+  externalReference: String
+  """
+  Language code for the order.
+  """
+  languageCode: LanguageCodeEnum
+  """
+  Metadata for the order.
+  """
+  metadata: [MetadataInput!]
+  """
+  Private metadata for the order.
+  """
+  privateMetadata: [MetadataInput!]
+  """
+  Shipping address for the order.
+  """
+  shippingAddress: AddressInput
+  """
+  Email of the user who placed the order.
+  """
+  userEmail: String
+}
+
+"""
+Input for metadata.
+"""
+input MetadataInput {
+  """
+  Metadata key.
+  """
+  key: String!
+  """
+  Metadata value.
+  """
+  value: String!
+}
+
+"""
+Input for translating a product variant name.
+"""
+input NameTranslationInput {
+  """
+  Translated name.
+  """
+  name: String!
+}
+
+"""
+Input for preorder settings.
+"""
+input PreorderSettingsInput {
+  """
+  Preorder end date.
+  """
+  endDate: DateTime
+  """
+  Global preorder threshold.
+  """
+  globalThreshold: Int
+}
+
+"""
+Input for bulk product variant creation.
+"""
+input ProductVariantBulkCreateInput {
+  """
+  List of attributes.
+  """
+  attributes: [AttributeValueInput!]!
+  """
+  External reference for the variant.
+  """
+  externalReference: String
+  """
+  Metadata for the variant.
+  """
+  metadata: [MetadataInput!]
+  """
+  Variant name.
+  """
+  name: String
+  """
+  Preorder settings for the variant.
+  """
+  preorder: PreorderSettingsInput
+  """
+  Private metadata for the variant.
+  """
+  privateMetadata: [MetadataInput!]
+  """
+  Maximum quantity per customer.
+  """
+  quantityLimitPerCustomer: Int
+  """
+  Stock keeping unit.
+  """
+  sku: String
+  """
+  Stock details for the variant.
+  """
+  stocks: [StockInput!]
+  """
+  Whether to track inventory.
+  """
+  trackInventory: Boolean
+  """
+  Weight of the variant.
+  """
+  weight: WeightScalar
+}
+
+"""
+Input for bulk product variant translation.
+"""
+input ProductVariantBulkTranslateInput {
+  """
+  ID of the product variant.
+  """
+  id: ID!
+  """
+  Language code for translation.
+  """
+  languageCode: LanguageCodeEnum!
+  """
+  Translated name.
+  """
+  name: String!
+}
+
+"""
+Input for updating product variant channel listings.
+"""
+input ProductVariantChannelListingAddInput {
+  """
+  Channel ID.
+  """
+  channelId: ID!
+  """
+  Cost price of the variant.
+  """
+  costPrice: PositiveDecimal
+  """
+  Price of the variant.
+  """
+  price: PositiveDecimal!
+  """
+  Preorder threshold for the variant.
+  """
+  preorderThreshold: Int
+  """
+  Previous price of the variant.
+  """
+  priorPrice: PositiveDecimal
+}
+
+"""
+Input for reordering items.
+"""
+input ReorderInput {
+  """
+  ID of the item to reorder.
+  """
+  id: ID!
+  """
+  New sort order position.
+  """
+  sortOrder: Int
+}
+
+"""
+Input for stock details.
+"""
+input StockInput {
+  """
+  Quantity in the stock.
+  """
+  quantity: Int!
+  """
+  Warehouse ID.
+  """
+  warehouse: ID!
+}
+
+"""
+Input for translating a product.
+"""
+input ProductTranslationInput {
+  """
+  Translated product name.
+  """
+  name: String!
+}
+
+"""
+Input for updating a product.
+"""
+input ProductUpdateInput {
+  """
+  Updated category ID.
+  """
+  category: ID
+  """
+  Updated product name.
+  """
+  name: String
+  """
+  Updated product type ID.
+  """
+  productType: ID
+  """
+  Updated product slug.
+  """
+  slug: String
+}
+
+"""
+DateTime scalar type.
+"""
+scalar DateTime
+
+"""
+Positive decimal scalar type.
+"""
+scalar PositiveDecimal
+
+"""
+Weight scalar type.
+"""
+scalar WeightScalar
+
+"""
+Enum for error handling policies.
+"""
+enum ErrorPolicyEnum {
+  """
+  Reject the entire operation if any error occurs.
+  """
+  REJECT_EVERYTHING
+  """
+  Ignore failed items and continue processing.
+  """
+  IGNORE_FAILED
+}
+
+"""
+Language codes for translations.
+"""
+enum LanguageCodeEnum {
+  """
+  English.
+  """
+  EN
+  """
+  French.
+  """
+  FR
+}
+
+"""
+Enum for variant attribute scope.
+"""
+enum VariantAttributeScope {
+  """
+  All attributes.
+  """
+  ALL
+  """
+  Variant-specific attributes.
+  """
+  VARIANT
 }

@@ -2,18 +2,23 @@
   "name": "saleor-graphql-docs",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
+    "start": "node index.js",
+    "build": "node magidoc.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["graphql", "documentation", "saleor", "api"],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "GraphQL API documentation for Saleor platform",
   "devDependencies": {
     "@magidoc/cli": "^5.0.3"
   },
   "dependencies": {
-    "express": "^5.1.0",
+    "express": "^4.18.2",
     "fs-extra": "^11.3.0",
     "graphql": "^16.11.0",
     "graphql-request": "^7.2.0",
